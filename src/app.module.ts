@@ -1,40 +1,46 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  ValidationPipe,
-} from '@nestjs/common';
-import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CatsModule } from './cats/cats.module';
 import { AllExceptionsFilter } from './common/exception/all-exceptions.filter';
-import { AnyExceptionsFilter } from './common/exception/any-exception.filter';
-import { HttpExceptionFilter } from './common/exception/http-exception.filter';
+import { RolesGuard } from './common/guard/roles.guard';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { CustomValitationPipe } from './common/pipe/custom-validate.pipe';
+import { UserModule } from './user/user.module';
 
 @Module({
-  imports: [CatsModule],
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: '127.0.0.1',
+      port: 3306,
+      username: 'root',
+      password: 'admin',
+      database: 'blog',
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true
+    }),
+    CatsModule,
+    UserModule
+  ],
   controllers: [AppController],
   providers: [
     AppService,
     {
       provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: AnyExceptionsFilter,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
+      useClass: AllExceptionsFilter
     },
     {
       provide: APP_PIPE,
-      useClass: ValidationPipe,
+      useClass: CustomValitationPipe
     },
-  ],
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard
+    }
+  ]
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
