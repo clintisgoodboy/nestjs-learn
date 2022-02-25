@@ -10,28 +10,23 @@ import {
 } from '@nestjs/common';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { LoggingInterceptor } from 'src/common/interceptor/logging.interceptor';
-import { TimeoutInterceptor } from 'src/common/interceptor/timeout.interceptor';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
 
 @Controller('cats')
-@UseInterceptors(LoggingInterceptor)
 export class CatsController {
   constructor(private readonly catsService: CatsService) {}
 
   @Post()
   @Roles('admin')
+  @UseInterceptors(LoggingInterceptor)
   create(@Body() createCatDto: CreateCatDto) {
     this.catsService.create(createCatDto);
   }
 
   @Get()
-  // @UseInterceptors(TransformInterceptor)
-  // @UseInterceptors(ErrorsInterceptor)
-  @UseInterceptors(TimeoutInterceptor)
   async findAll() {
-    // this.catsService.findAll();
     await new Promise((resolve, rejects) => {
       setTimeout(() => {
         resolve('');

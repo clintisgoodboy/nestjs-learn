@@ -13,8 +13,6 @@ export class CatsService {
   }
 
   findOne(id: number) {
-    console.log(typeof id);
-
     return `This action returns a #${id} cat`;
   }
 

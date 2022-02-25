@@ -15,27 +15,27 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
+  @Post('add-user')
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 
-  @Get()
+  @Get('get-user')
   findAll() {
     return this.userService.findAll();
   }
 
-  @Get(':id')
+  @Get('get-user/:id')
   findOne(@Param('id') id: string) {
     return this.userService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @Patch('set-user')
+  update(@Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete('remove-user/:id')
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
   }
