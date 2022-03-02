@@ -1,34 +1,23 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CatsModule } from './cats/cats.module';
 import { AllExceptionsFilter } from './common/exception/all-exceptions.filter';
 import { RolesGuard } from './common/guard/roles.guard';
 import { TransformInterceptor } from './common/interceptor/transform.interceptor';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { CustomValitationPipe } from './common/pipe/custom-validate.pipe';
-import { MessagesModule } from './message/messages.module';
-import { UserModule } from './user/user.module';
+import { UserModule } from './modules/user/user.module';
+import { resolve } from 'path';
+import { ConfigModule, ConfigService } from 'nestjs-config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: '127.0.0.1',
-      port: 3306,
-      username: 'root',
-      password: 'admin',
-      // 数据名字
-      database: 'blog',
-      // 加载实体文件方式一
-      // entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      // 加载实体文件方式二
-      autoLoadEntities: true,
-      // 代表是否自动将实体类同步到数据库
-      synchronize: true
+    ConfigModule.load(resolve(__dirname, 'config', '**/!(*.d).{ts,js}')),
+    TypeOrmModule.forRootAsync({
+      // database为src/config/database.ts的文件
+      useFactory: (config: ConfigService) => config.get('database'),
+      inject: [ConfigService]
     }),
-    CatsModule,
-    MessagesModule,
     UserModule
   ],
   /**

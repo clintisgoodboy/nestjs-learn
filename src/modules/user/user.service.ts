@@ -26,7 +26,7 @@ export class UserService {
     //   .into(User)
     //   .values([createUserDto])
     //   .execute();
-    await this.userRepository.insert(createUserDto);
+    const res = await this.userRepository.insert(createUserDto);
 
     return '插入成功';
   }
